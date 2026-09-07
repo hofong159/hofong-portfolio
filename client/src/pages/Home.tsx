@@ -66,7 +66,7 @@ type SiteContent = {
 type Comment = { id: number; name: string; content: string; date: string };
 
 const IMAGE_BASE = "https://images.unsplash.com/";
-const GITHUB_ASSET_BASE = "https://raw.githubusercontent.com/hofong/portfolio-assets/main/";
+const GITHUB_ASSET_BASE = "https://raw.githubusercontent.com/hofong159/portfolio-assets/main/";
 const assetUrl = (value: string) => value.startsWith("http") ? value : `${GITHUB_ASSET_BASE}${value.replace(/^\/+/, "")}`;
 const DEFAULT_CONTENT: SiteContent = {
   heroEyebrow: "DIGITAL ARCHITECT / CREATIVE TECHNOLOGIST",
