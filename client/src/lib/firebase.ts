@@ -1,4 +1,5 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 import { doc, getFirestore, setDoc } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -11,6 +12,8 @@ const firebaseConfig = {
   appId: "1:254096787618:web:a90e48def9dbe696a7affb",
   measurementId: "G-GHH3G5YRWP",
 };
+
+export const auth = getAuth(getApps().length ? getApp() : initializeApp(firebaseConfig));
 
 export async function syncSiteContent(content: unknown): Promise<boolean> {
   try {
