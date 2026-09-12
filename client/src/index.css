@@ -140,3 +140,5 @@ em { color: var(--accent); font-style: normal; }
 .editable-copy { white-space: pre-line; }.admin-subhead { margin-top:18px; }
 
 .add-experience-button { margin-top:12px; }
+
+.certificate-image-button { display:block; width:calc(100% + 52px); margin:-26px -26px 22px; padding:0; border:0; background:var(--surface-2); cursor:zoom-in; }.certificate-card img { display:block; width:100%; aspect-ratio:1; max-height:none; object-fit:cover; margin:0; }.certificate-image-button:hover img { opacity:.82; }.add-note-button { margin-top:12px; }
