@@ -8,12 +8,10 @@
 
 ```text
 portfolio-assets/
-├── images/
-│   ├── portrait-2026.webp
+├── │   ├── portrait-2026.webp
 │   ├── lightwell-01.webp
 │   └── lightwell-02.webp
-└── pdf/
-    └── lightwell-case-study.pdf
+└──     └── lightwell-case-study.pdf
 ```
 
 ## 後台輸入方式
@@ -54,3 +52,7 @@ lightwell-case-study.pdf
 6. 若修改的是網站程式或 GitHub Pages 設定，才需要等待網站重新部署；單純更換素材通常不需要改程式。
 
 照片會以完整比例顯示，不會被裁切；PDF 會在案例視窗內預覽，也可以開新分頁查看。
+
+## 最新規則：直接放在 repository 第一層
+
+照片與 PDF 不需要建立子資料夾，直接拖曳到 `portfolio-assets` repository 的第一層即可。後台只填完整檔名，例如 `portrait.webp` 或 `case-study.pdf`。
