@@ -136,3 +136,5 @@ em { color: var(--accent); font-style: normal; }
 .project-media iframe { width:100%; height:100%; border:0; background:#fff; pointer-events:none; }.empty-project-media { width:100%; height:100%; display:grid; place-items:center; padding:20px; color:var(--muted); background:var(--surface-2); font-size:12px; text-align:center; }.website-preview { width:100%; min-height:62vh; border:1px solid var(--line); background:#fff; }.has-web-preview { cursor:pointer; }
 
 .experience-link { color:inherit; display:inline-flex; align-items:center; gap:6px; text-decoration:none; border-bottom:1px solid transparent; transition:color .18s ease,border-color .18s ease; }.experience-link:hover { color:var(--accent); border-color:var(--accent); }
+
+.editable-copy { white-space: pre-line; }.admin-subhead { margin-top:18px; }
