@@ -134,3 +134,5 @@ em { color: var(--accent); font-style: normal; }
 .tag-editor-list { display:grid; gap:7px; margin:8px 0; }.tag-editor-row { display:grid; grid-template-columns:1fr auto; gap:7px; align-items:center; }.tag-editor-row input { margin:0; }.tag-add-button { min-height:30px; padding:0 10px; font-size:10px; }
 
 .project-media iframe { width:100%; height:100%; border:0; background:#fff; pointer-events:none; }.empty-project-media { width:100%; height:100%; display:grid; place-items:center; padding:20px; color:var(--muted); background:var(--surface-2); font-size:12px; text-align:center; }.website-preview { width:100%; min-height:62vh; border:1px solid var(--line); background:#fff; }.has-web-preview { cursor:pointer; }
+
+.experience-link { color:inherit; display:inline-flex; align-items:center; gap:6px; text-decoration:none; border-bottom:1px solid transparent; transition:color .18s ease,border-color .18s ease; }.experience-link:hover { color:var(--accent); border-color:var(--accent); }
