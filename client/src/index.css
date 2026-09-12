@@ -130,3 +130,5 @@ em { color: var(--accent); font-style: normal; }
 .category-editor-list { display:grid; gap:8px; margin:12px 0 16px; }.category-editor-row { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; }.category-editor-row input { margin:0; }.category-editor-row .delete-button { font-size:10px; }
 
 .portrait-frame { inset: 7% auto auto 12%; width: 78%; aspect-ratio: 1; }
+
+.tag-editor-list { display:grid; gap:7px; margin:8px 0; }.tag-editor-row { display:grid; grid-template-columns:1fr auto; gap:7px; align-items:center; }.tag-editor-row input { margin:0; }.tag-add-button { min-height:30px; padding:0 10px; font-size:10px; }
