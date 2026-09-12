@@ -138,3 +138,5 @@ em { color: var(--accent); font-style: normal; }
 .experience-link { color:inherit; display:inline-flex; align-items:center; gap:6px; text-decoration:none; border-bottom:1px solid transparent; transition:color .18s ease,border-color .18s ease; }.experience-link:hover { color:var(--accent); border-color:var(--accent); }
 
 .editable-copy { white-space: pre-line; }.admin-subhead { margin-top:18px; }
+
+.add-experience-button { margin-top:12px; }
