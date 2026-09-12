@@ -56,3 +56,7 @@ lightwell-case-study.pdf
 ## 最新規則：直接放在 repository 第一層
 
 照片與 PDF 不需要建立子資料夾，直接拖曳到 `portfolio-assets` repository 的第一層即可。後台只填完整檔名，例如 `portrait.webp` 或 `case-study.pdf`。
+
+## 目前網站實際讀取位置
+
+網站目前會讀取 `hofong159/hofong-portfolio` repository 的第一層檔案。若要使用 `個人照.jpg`，請把檔案放在該 repository 根目錄，後台只輸入 `個人照.jpg`。中文檔名可以使用，但英文檔名仍較不容易出錯。
