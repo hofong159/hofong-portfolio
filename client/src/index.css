@@ -142,3 +142,17 @@ em { color: var(--accent); font-style: normal; }
 .add-experience-button { margin-top:12px; }
 
 .certificate-image-button { display:block; width:calc(100% + 52px); margin:-26px -26px 22px; padding:0; border:0; background:var(--surface-2); cursor:zoom-in; }.certificate-card img { display:block; width:100%; aspect-ratio:1; max-height:none; object-fit:cover; margin:0; }.certificate-image-button:hover img { opacity:.82; }.add-note-button { margin-top:12px; }
+
+/* portfolio-grid-override: equal cards instead of the previous featured-card layout */
+.project-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 42px 20px; align-items: start; }
+.project-list .project-card, .project-list .project-card:nth-child(3n) { grid-column: auto; display: block; }
+.project-list .project-card .project-media, .project-list .project-card:nth-child(3n) .project-media { aspect-ratio: 1.18; }
+.project-list .project-info h3 { font-size: clamp(19px, 2vw, 25px); margin-top: 12px; }
+.certificate-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.certificate-card { padding: 16px; }
+.certificate-image-button { width: calc(100% + 32px); margin: -16px -16px 16px; }
+.certificate-card h3 { font-size: 18px; margin: 10px 0 7px; }
+.certificate-card p { font-size: 12px; line-height: 1.6; }
+.certificate-meta { gap: 8px; margin-top: 14px; }
+@media (max-width: 850px) { .project-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 16px; } .project-list .project-card .project-media, .project-list .project-card:nth-child(3n) .project-media { aspect-ratio: 1.1; } .certificate-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 540px) { .project-list { grid-template-columns: 1fr; gap: 42px; } .certificate-grid { grid-template-columns: 1fr; } }
