@@ -161,3 +161,20 @@ em { color: var(--accent); font-style: normal; }
 .admin-main[data-active-tab] [data-admin-panels] { display:none; }
 .admin-main[data-active-tab="home"] [data-admin-panels~="home"], .admin-main[data-active-tab="experience"] [data-admin-panels~="experience"], .admin-main[data-active-tab="work"] [data-admin-panels~="work"], .admin-main[data-active-tab="certificates"] [data-admin-panels~="certificates"], .admin-main[data-active-tab="notes"] [data-admin-panels~="notes"], .admin-main[data-active-tab="contact"] [data-admin-panels~="contact"] { display:block; }
 .admin-menu { display:grid; gap:7px; }.admin-menu button { display:flex; align-items:center; gap:9px; width:100%; text-align:left; }.admin-menu button span { margin-left:auto; color:var(--accent); font:10px 'DM Mono',monospace; }.admin-menu button.active { color:var(--ink); border-color:var(--accent); background:rgba(214,255,93,.08); }
+
+/* Public site: keep the profile visible and open other sections on demand. */
+.site-shell.section-profile #timeline, .site-shell.section-profile #work, .site-shell.section-profile #certificates, .site-shell.section-profile #journal, .site-shell.section-profile #contact { display:none; }
+.site-shell.section-timeline #work, .site-shell.section-timeline #certificates, .site-shell.section-timeline #journal, .site-shell.section-timeline #contact { display:none; }
+.site-shell.section-work #timeline, .site-shell.section-work #certificates, .site-shell.section-work #journal, .site-shell.section-work #contact { display:none; }
+.site-shell.section-certificates #timeline, .site-shell.section-certificates #work, .site-shell.section-certificates #journal, .site-shell.section-certificates #contact { display:none; }
+.site-shell.section-journal #timeline, .site-shell.section-journal #work, .site-shell.section-journal #certificates, .site-shell.section-journal #contact { display:none; }
+.site-shell.section-contact #timeline, .site-shell.section-contact #work, .site-shell.section-contact #certificates, .site-shell.section-contact #journal { display:none; }
+.site-shell::before, .site-shell::after { content:""; position:fixed; pointer-events:none; z-index:0; border-radius:999px; filter:blur(2px); opacity:.24; }
+.site-shell::before { width:42vw; height:42vw; top:18vh; right:-16vw; background:radial-gradient(circle, rgba(53,117,255,.24), transparent 68%); animation: drift-a 13s ease-in-out infinite alternate; }
+.site-shell::after { width:30vw; height:30vw; bottom:4vh; left:-12vw; background:radial-gradient(circle, rgba(214,255,93,.18), transparent 68%); animation: drift-b 16s ease-in-out infinite alternate; }
+.site-shell > * { position:relative; z-index:1; }
+@keyframes drift-a { from { transform:translate3d(0,0,0) scale(1); } to { transform:translate3d(-4vw,3vh,0) scale(1.08); } }
+@keyframes drift-b { from { transform:translate3d(0,0,0) scale(1); } to { transform:translate3d(5vw,-2vh,0) scale(1.12); } }
+.project-editor[draggable], .repeat-editor[draggable] { cursor:grab; transition:transform .18s ease, border-color .18s ease, background .18s ease; }
+.project-editor[draggable]:active, .repeat-editor[draggable]:active { cursor:grabbing; transform:scale(.99); border-color:var(--accent); background:rgba(214,255,93,.045); }
+@media (prefers-reduced-motion: reduce) { .site-shell::before, .site-shell::after { animation:none; } }
