@@ -162,19 +162,28 @@ em { color: var(--accent); font-style: normal; }
 .admin-main[data-active-tab="home"] [data-admin-panels~="home"], .admin-main[data-active-tab="experience"] [data-admin-panels~="experience"], .admin-main[data-active-tab="work"] [data-admin-panels~="work"], .admin-main[data-active-tab="certificates"] [data-admin-panels~="certificates"], .admin-main[data-active-tab="notes"] [data-admin-panels~="notes"], .admin-main[data-active-tab="contact"] [data-admin-panels~="contact"] { display:block; }
 .admin-menu { display:grid; gap:7px; }.admin-menu button { display:flex; align-items:center; gap:9px; width:100%; text-align:left; }.admin-menu button span { margin-left:auto; color:var(--accent); font:10px 'DM Mono',monospace; }.admin-menu button.active { color:var(--ink); border-color:var(--accent); background:rgba(214,255,93,.08); }
 
-/* Public site: keep the profile visible and open other sections on demand. */
-.site-shell.section-profile #timeline, .site-shell.section-profile #work, .site-shell.section-profile #certificates, .site-shell.section-profile #journal, .site-shell.section-profile #contact { display:none; }
-.site-shell.section-timeline #work, .site-shell.section-timeline #certificates, .site-shell.section-timeline #journal, .site-shell.section-timeline #contact { display:none; }
-.site-shell.section-work #timeline, .site-shell.section-work #certificates, .site-shell.section-work #journal, .site-shell.section-work #contact { display:none; }
-.site-shell.section-certificates #timeline, .site-shell.section-certificates #work, .site-shell.section-certificates #journal, .site-shell.section-certificates #contact { display:none; }
-.site-shell.section-journal #timeline, .site-shell.section-journal #work, .site-shell.section-journal #certificates, .site-shell.section-journal #contact { display:none; }
-.site-shell.section-contact #timeline, .site-shell.section-contact #work, .site-shell.section-contact #certificates, .site-shell.section-contact #journal { display:none; }
-.site-shell::before, .site-shell::after { content:""; position:fixed; pointer-events:none; z-index:0; border-radius:999px; filter:blur(2px); opacity:.24; }
-.site-shell::before { width:42vw; height:42vw; top:18vh; right:-16vw; background:radial-gradient(circle, rgba(53,117,255,.24), transparent 68%); animation: drift-a 13s ease-in-out infinite alternate; }
-.site-shell::after { width:30vw; height:30vw; bottom:4vh; left:-12vw; background:radial-gradient(circle, rgba(214,255,93,.18), transparent 68%); animation: drift-b 16s ease-in-out infinite alternate; }
-.site-shell > * { position:relative; z-index:1; }
-@keyframes drift-a { from { transform:translate3d(0,0,0) scale(1); } to { transform:translate3d(-4vw,3vh,0) scale(1.08); } }
-@keyframes drift-b { from { transform:translate3d(0,0,0) scale(1); } to { transform:translate3d(5vw,-2vh,0) scale(1.12); } }
-.project-editor[draggable], .repeat-editor[draggable] { cursor:grab; transition:transform .18s ease, border-color .18s ease, background .18s ease; }
-.project-editor[draggable]:active, .repeat-editor[draggable]:active { cursor:grabbing; transform:scale(.99); border-color:var(--accent); background:rgba(214,255,93,.045); }
-@media (prefers-reduced-motion: reduce) { .site-shell::before, .site-shell::after { animation:none; } }
+/* Public site navigation and section transitions */
+.site-nav { top: 0 !important; left: 0; right: 0; position: fixed !important; }
+.site-shell { padding-top: 0; }
+.site-shell section[id]:not(#top) { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(22px); max-height: 0; overflow: hidden; padding-top: 0; padding-bottom: 0; transition: opacity .42s var(--ease-out), transform .42s var(--ease-out), visibility .42s, max-height .52s var(--ease-out), padding .42s var(--ease-out); }
+.site-shell.section-profile #about,
+.site-shell.section-profile .guestbook-section,
+.site-shell.section-timeline #about, .site-shell.section-timeline #timeline,
+.site-shell.section-work #about, .site-shell.section-work #work,
+.site-shell.section-certificates #about, .site-shell.section-certificates #certificates,
+.site-shell.section-journal #about, .site-shell.section-journal #journal,
+.site-shell.section-contact #about, .site-shell.section-contact #contact { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); max-height: 3000px; padding-top: clamp(90px, 12vw, 165px); padding-bottom: clamp(90px, 12vw, 165px); }
+.site-shell.section-profile .guestbook-section, .site-shell.section-timeline .guestbook-section, .site-shell.section-work .guestbook-section, .site-shell.section-certificates .guestbook-section, .site-shell.section-journal .guestbook-section, .site-shell.section-contact .guestbook-section { opacity: 0; visibility: hidden; pointer-events: none; max-height: 0; overflow: hidden; padding-top: 0; padding-bottom: 0; }
+.site-shell.section-profile #about { padding-top: 138px; }
+.site-shell.section-profile #about { transition-delay: .03s; }
+.site-shell.section-timeline #timeline, .site-shell.section-work #work, .site-shell.section-certificates #certificates, .site-shell.section-journal #journal, .site-shell.section-contact #contact { transition-delay: .06s; }
+.home-contact { display:flex; flex-wrap:wrap; gap:12px 22px; align-items:center; margin-top:28px; padding-top:18px; border-top:1px solid var(--line); }
+.home-contact-label { color:var(--accent); font:9px 'DM Mono',monospace; letter-spacing:.14em; }
+.home-contact button, .home-contact a { display:inline-flex; align-items:center; gap:7px; color:var(--muted); background:none; border:0; text-decoration:none; font:11px 'DM Mono',monospace; cursor:pointer; }
+.home-contact button:hover, .home-contact a:hover { color:var(--accent); }
+.card-number, .project-index { display:none !important; }
+.admin-sidebar { position: sticky; top: 76px; height: calc(100vh - 76px); align-self: start; overflow-y: auto; }
+.admin-main { min-width: 0; }
+.project-editor[draggable], .repeat-editor[draggable] { user-select:none; }
+@media (max-width: 850px) { .site-nav { top:0 !important; } .admin-sidebar { position: static; height:auto; overflow:visible; } .site-shell section[id]:not(#top) { transition-duration:.36s; } }
+@media (prefers-reduced-motion: reduce) { .site-shell section[id]:not(#top) { transition:none; } }

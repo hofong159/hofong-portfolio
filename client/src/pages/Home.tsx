@@ -107,6 +107,16 @@ const assetUrl = (value: string) => {
   return `${base}${encoded}`;
 };
 const isPreviewableUrl = (value?: string) => Boolean(value && /^https?:\/\//i.test(value));
+const withoutSectionNumber = (value: string) => value.replace(/^\s*\d+\s*\/\s*/, "");
+const uniqueById = <T extends { id: number }>(items: T[]) => {
+  const seen = new Set<number>();
+  return items.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+};
+
 const DEFAULT_CONTENT: SiteContent = {
   profileKicker: "01 / PROFILE",
   profileTitle: "在物質與螢幕之間，\n保留人的尺度。",
@@ -216,16 +226,16 @@ function loadContent(): SiteContent {
       ...DEFAULT_CONTENT,
       ...parsed,
       categories: Array.isArray(parsed.categories) && parsed.categories.length ? parsed.categories.filter((item): item is string => typeof item === "string" && item.trim().length > 0) : DEFAULT_CONTENT.categories,
-      certificates: Array.isArray(parsed.certificates) ? parsed.certificates : DEFAULT_CONTENT.certificates,
-      stats: Array.isArray(parsed.stats) ? parsed.stats : DEFAULT_CONTENT.stats,
-      skills: Array.isArray(parsed.skills) ? parsed.skills : DEFAULT_CONTENT.skills,
-      projects: (Array.isArray(parsed.projects) ? parsed.projects : DEFAULT_CONTENT.projects).map((project) => ({
+      certificates: uniqueById(Array.isArray(parsed.certificates) ? parsed.certificates : DEFAULT_CONTENT.certificates),
+      stats: uniqueById(Array.isArray(parsed.stats) ? parsed.stats : DEFAULT_CONTENT.stats),
+      skills: uniqueById(Array.isArray(parsed.skills) ? parsed.skills : DEFAULT_CONTENT.skills),
+      projects: uniqueById((Array.isArray(parsed.projects) ? parsed.projects : DEFAULT_CONTENT.projects).map((project) => ({
         ...project,
         imageFiles: Array.isArray(project.imageFiles) ? project.imageFiles : project.images,
         pdfFile: project.pdfFile || project.pdf || "",
-      })),
-      experiences: (Array.isArray(parsed.experiences) ? parsed.experiences : DEFAULT_CONTENT.experiences).map((item) => ({ ...item, link: item.link || "" })),
-      notes: Array.isArray(parsed.notes) ? parsed.notes : DEFAULT_CONTENT.notes,
+      }))),
+      experiences: uniqueById((Array.isArray(parsed.experiences) ? parsed.experiences : DEFAULT_CONTENT.experiences).map((item) => ({ ...item, link: item.link || "" }))),
+      notes: uniqueById(Array.isArray(parsed.notes) ? parsed.notes : DEFAULT_CONTENT.notes),
       nowKicker: typeof parsed.nowKicker === "string" ? parsed.nowKicker : DEFAULT_CONTENT.nowKicker,
       nowTitle: typeof parsed.nowTitle === "string" ? parsed.nowTitle : DEFAULT_CONTENT.nowTitle,
       nowItems: Array.isArray(parsed.nowItems) ? parsed.nowItems.filter((item): item is string => typeof item === "string") : DEFAULT_CONTENT.nowItems,
@@ -242,12 +252,12 @@ function loadContentFromValue(value: SiteContent): SiteContent {
     ...DEFAULT_CONTENT,
     ...parsed,
     categories: Array.isArray(parsed.categories) && parsed.categories.length ? parsed.categories.filter((item): item is string => typeof item === "string" && item.trim().length > 0) : DEFAULT_CONTENT.categories,
-    certificates: Array.isArray(parsed.certificates) ? parsed.certificates : DEFAULT_CONTENT.certificates,
-    stats: Array.isArray(parsed.stats) ? parsed.stats : DEFAULT_CONTENT.stats,
-    skills: Array.isArray(parsed.skills) ? parsed.skills : DEFAULT_CONTENT.skills,
-    projects: (Array.isArray(parsed.projects) ? parsed.projects : DEFAULT_CONTENT.projects).map((project) => ({ ...project, imageFiles: Array.isArray(project.imageFiles) ? project.imageFiles : project.images, pdfFile: project.pdfFile || project.pdf || "" })),
-    experiences: (Array.isArray(parsed.experiences) ? parsed.experiences : DEFAULT_CONTENT.experiences).map((item) => ({ ...item, link: item.link || "" })),
-    notes: Array.isArray(parsed.notes) ? parsed.notes : DEFAULT_CONTENT.notes,
+    certificates: uniqueById(Array.isArray(parsed.certificates) ? parsed.certificates : DEFAULT_CONTENT.certificates),
+    stats: uniqueById(Array.isArray(parsed.stats) ? parsed.stats : DEFAULT_CONTENT.stats),
+    skills: uniqueById(Array.isArray(parsed.skills) ? parsed.skills : DEFAULT_CONTENT.skills),
+    projects: uniqueById((Array.isArray(parsed.projects) ? parsed.projects : DEFAULT_CONTENT.projects).map((project) => ({ ...project, imageFiles: Array.isArray(project.imageFiles) ? project.imageFiles : project.images, pdfFile: project.pdfFile || project.pdf || "" }))),
+    experiences: uniqueById((Array.isArray(parsed.experiences) ? parsed.experiences : DEFAULT_CONTENT.experiences).map((item) => ({ ...item, link: item.link || "" }))),
+    notes: uniqueById(Array.isArray(parsed.notes) ? parsed.notes : DEFAULT_CONTENT.notes),
     nowKicker: typeof parsed.nowKicker === "string" ? parsed.nowKicker : DEFAULT_CONTENT.nowKicker,
     nowTitle: typeof parsed.nowTitle === "string" ? parsed.nowTitle : DEFAULT_CONTENT.nowTitle,
     nowItems: Array.isArray(parsed.nowItems) ? parsed.nowItems.filter((item): item is string => typeof item === "string") : DEFAULT_CONTENT.nowItems,
@@ -329,7 +339,7 @@ export default function Home() {
   const scrollTo = (id: string) => {
     setPage("home");
     setMobileNav(false);
-    const next = id === "about" ? "profile" : id as "timeline" | "work" | "certificates" | "journal" | "contact";
+    const next = id === "about" || id === "top" ? "profile" : id as "timeline" | "work" | "certificates" | "journal" | "contact";
     setActiveSection(next);
     window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }), 40);
   };
@@ -392,9 +402,9 @@ export default function Home() {
     const index = previous.experiences.findIndex((item) => item.id === id);
     return { ...previous, experiences: reorder(previous.experiences, index, direction) };
   });
-  const addExperience = () => setAdminDraft((previous) => ({ ...previous, experiences: [...previous.experiences, { id: Date.now(), year: "2026", title: "新經歷", detail: "請補上這段經歷的說明。", link: "" }] }));
+  const addExperience = () => setAdminDraft((previous) => ({ ...previous, experiences: uniqueById([...previous.experiences, { id: Date.now(), year: "2026", title: "新經歷", detail: "請補上這段經歷的說明。", link: "" }]) }));
   const deleteExperience = (id: number) => setAdminDraft((previous) => ({ ...previous, experiences: previous.experiences.filter((item) => item.id !== id) }));
-  const addNote = () => setAdminDraft((previous) => ({ ...previous, notes: [...previous.notes, { id: Date.now(), type: "NOTE / NEW", title: "新筆記", description: "請補上筆記內容。", readTime: "03 MIN READ" }] }));
+  const addNote = () => setAdminDraft((previous) => ({ ...previous, notes: uniqueById([...previous.notes, { id: Date.now(), type: "NOTE / NEW", title: "新筆記", description: "請補上筆記內容。", readTime: "03 MIN READ" }]) }));
   const deleteNote = (id: number) => setAdminDraft((previous) => ({ ...previous, notes: previous.notes.filter((item) => item.id !== id) }));
   const moveNote = (id: number, direction: -1 | 1) => setAdminDraft((previous) => {
     const index = previous.notes.findIndex((item) => item.id === id);
@@ -415,7 +425,7 @@ export default function Home() {
       imageFiles: [`${IMAGE_BASE}photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1600&q=85`],
       pdfFile: "",
     };
-    setAdminDraft((previous) => ({ ...previous, projects: [project, ...previous.projects] }));
+    setAdminDraft((previous) => ({ ...previous, projects: uniqueById([project, ...previous.projects]) }));
     setNewProject({ title: "", category: "建築圖面", description: "" });
     setNotice("作品草稿已加入，儲存後會顯示在作品集");
   };
@@ -435,14 +445,14 @@ export default function Home() {
   const moveByDrag = (kind: "projects" | "experiences" | "notes", sourceId: number, targetId: number) => {
     if (sourceId === targetId) return;
     setAdminDraft((previous) => {
-      const list = previous[kind] as { id: number }[];
+      const list = uniqueById(previous[kind] as { id: number }[]);
       const from = list.findIndex((item) => item.id === sourceId);
       const to = list.findIndex((item) => item.id === targetId);
       if (from < 0 || to < 0) return previous;
       const next = [...list];
       const [item] = next.splice(from, 1);
       next.splice(to, 0, item);
-      return { ...previous, [kind]: next } as SiteContent;
+      return { ...previous, [kind]: uniqueById(next) } as SiteContent;
     });
     setDragKey(null);
   };
@@ -510,16 +520,16 @@ export default function Home() {
           </section>
 
           <section className="intro-strip" id="about">
-            <div className="section-kicker">{content.profileKicker}</div>
+            <div className="section-kicker">{withoutSectionNumber(content.profileKicker)}</div>
             <div className="intro-layout">
               <h2 className="editable-copy">{content.profileTitle}</h2>
               <div className="intro-text"><p>{content.profileBody1}</p><p>{content.profileBody2}</p><button className="text-link" onClick={() => scrollTo("timeline")}>查看完整經歷 <ArrowUpRight size={14} /></button></div>
             </div>
-            <div className="stats-row">{content.stats.map((stat) => <div key={stat.id}><strong>{stat.value}</strong><span>{stat.label}</span></div>)}</div>
+            <div className="stats-row">{content.stats.map((stat) => <div key={stat.id}><strong>{stat.value}</strong><span>{stat.label}</span></div>)}</div><div className="home-contact"><span className="home-contact-label">CONTACT</span><button onClick={copyEmail}><Mail size={15} /> {content.email}</button><a href={content.instagram} target="_blank" rel="noreferrer"><Instagram size={15} /> Instagram</a></div>
           </section>
 
           <section className="timeline-section" id="timeline">
-            <div className="section-kicker">{content.timelineKicker}</div><div className="section-head compact"><h2 className="editable-copy">{content.timelineTitle}</h2><p>{content.timelineDescription}</p></div>
+            <div className="section-kicker">{withoutSectionNumber(content.timelineKicker)}</div><div className="section-head compact"><h2 className="editable-copy">{content.timelineTitle}</h2><p>{content.timelineDescription}</p></div>
             <div className="timeline"><div className="timeline-line" />{content.experiences.map((experience) => <div className="timeline-item" key={experience.id}><span className="timeline-date">{experience.year}</span><div><h3>{experience.link ? <a className="experience-link" href={experience.link} target="_blank" rel="noreferrer">{experience.title} <ExternalLink size={13} /></a> : experience.title}</h3><p>{experience.detail}</p></div></div>)}</div>
             <div className="skills-grid">{content.skills.map((skill) => <div key={skill.id}><span className="skill-label">{skill.label}</span><p>{skill.tools}</p></div>)}</div>
             <a className="cv-button" href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" target="_blank" rel="noreferrer"><FileText size={17} /> 下載履歷 PDF <Download size={15} /></a>
@@ -527,7 +537,7 @@ export default function Home() {
 
 
           <section className="work-section" id="work">
-            <div className="section-head"><div><div className="section-kicker">{content.workKicker}</div><h2 className="editable-copy">{content.workTitle}</h2></div><p>{content.workDescription}</p></div>
+            <div className="section-head"><div><div className="section-kicker">{withoutSectionNumber(content.workKicker)}</div><h2 className="editable-copy">{content.workTitle}</h2></div><p>{content.workDescription}</p></div>
             <div className="filter-row">{["全部", ...content.categories].map((item) => <button key={item} className={filter === item ? "active" : ""} onClick={() => setFilter(item)}>{item}<span>0{item === "全部" ? content.projects.length : content.projects.filter((p) => p.category === item).length}</span></button>)}</div>
             <div className="project-list">
               {filteredProjects.map((project, index) => {
@@ -545,20 +555,20 @@ export default function Home() {
           </section>
 
           <section className="certificates-section" id="certificates">
-            <div className="section-head"><div><div className="section-kicker">03 / CREDENTIALS</div><h2>證照與<br /><em>專業證明。</em></h2></div><p>把資格、證書與持續累積的專業能力，整理成清楚可查閱的公開紀錄。</p></div>
+            <div className="section-head"><div><div className="section-kicker">CREDENTIALS</div><h2>證照與<br /><em>專業證明。</em></h2></div><p>把資格、證書與持續累積的專業能力，整理成清楚可查閱的公開紀錄。</p></div>
             <div className="certificate-grid">{content.certificates.map((certificate) => <article className="certificate-card" key={certificate.id}>{certificate.imageFile && <button className="certificate-image-button" onClick={() => setLightbox({ images: [assetUrl(certificate.imageFile || "")], index: 0 })} aria-label={`放大查看${certificate.title}`}><img src={assetUrl(certificate.imageFile)} alt={certificate.title} /></button>}<div className="certificate-kicker">{certificate.year} · {certificate.issuer}</div><h3>{certificate.title}</h3><p>{certificate.description}</p><div className="certificate-meta"><span>{certificate.credential}</span>{certificate.pdfFile && <a href={`${assetUrl(certificate.pdfFile)}#toolbar=0`} target="_blank" rel="noreferrer"><FileText size={14} /> 查看證書 PDF</a>}{certificate.link && <a href={certificate.link} target="_blank" rel="noreferrer"><ExternalLink size={14} /> 官方連結</a>}</div></article>)}</div>
           </section>
 
           <section className="journal-section" id="journal">
-            <div className="section-head"><div><div className="section-kicker">04 / NOTES & NOW</div><h2>留下一些<br /><em>正在發生的事。</em></h2></div><p>設計之外，我也寫下觀察、測試與還沒有答案的問題。</p></div>
+            <div className="section-head"><div><div className="section-kicker">NOTES & NOW</div><h2>留下一些<br /><em>正在發生的事。</em></h2></div><p>設計之外，我也寫下觀察、測試與還沒有答案的問題。</p></div>
             <div className="journal-grid">{content.notes.map((note, index) => <article className={`note-card ${index === 0 ? 'featured' : ''}`} key={note.id}><span className="note-type">{note.type}</span><h3>{note.title.split('\n').map((line) => <span key={line}>{line}<br /></span>)}</h3><p>{note.description}</p><div className="note-footer"><span>{note.readTime}</span><ArrowUpRight size={16} /></div></article>)}<article className="now-card"><div className="now-header"><span className="pulse-dot" /> {content.nowKicker}</div><h3>{content.nowTitle}</h3><ul>{content.nowItems.map((item, index) => <li key={`${item}-${index}`}><span>{String(index + 1).padStart(2, "0")}</span>{item}</li>)}</ul><span className="now-footer">{content.nowFooter}</span></article></div>
           </section>
 
           <section className="contact-section" id="contact">
-            <div className="contact-card"><div className="section-kicker">05 / SAY HELLO</div><div className="contact-layout"><div><h2>有一個想法？<br /><em>讓我們把它做出來。</em></h2><p>不論是作品合作、展覽邀請，或只是想交換一個好問題，都歡迎寫信給我。</p><button className="email-line" onClick={copyEmail}><Mail size={17} /> {content.email} <Copy size={14} /></button><div className="social-links"><a href={content.instagram} target="_blank" rel="noreferrer"><Instagram size={17} /> Instagram</a></div></div><form className="contact-form" onSubmit={(event) => { event.preventDefault(); setContactSent(true); }}><label>你的名字<input required placeholder="How should I call you?" /></label><label>Email<input required type="email" placeholder="you@example.com" /></label><label>想聊什麼？<textarea required rows={4} placeholder="Tell me a little about the project..." /></label><button className="button button-primary" type="submit">{contactSent ? <><Check size={16} /> 已送出</> : <><Send size={16} /> 送出訊息</>}</button></form></div></div>
+            <div className="contact-card"><div className="section-kicker">SAY HELLO</div><div className="contact-layout"><div><h2>有一個想法？<br /><em>讓我們把它做出來。</em></h2><p>不論是作品合作、展覽邀請，或只是想交換一個好問題，都歡迎寫信給我。</p><button className="email-line" onClick={copyEmail}><Mail size={17} /> {content.email} <Copy size={14} /></button><div className="social-links"><a href={content.instagram} target="_blank" rel="noreferrer"><Instagram size={17} /> Instagram</a></div></div><form className="contact-form" onSubmit={(event) => { event.preventDefault(); setContactSent(true); }}><label>你的名字<input required placeholder="How should I call you?" /></label><label>Email<input required type="email" placeholder="you@example.com" /></label><label>想聊什麼？<textarea required rows={4} placeholder="Tell me a little about the project..." /></label><button className="button button-primary" type="submit">{contactSent ? <><Check size={16} /> 已送出</> : <><Send size={16} /> 送出訊息</>}</button></form></div></div>
           </section>
 
-          <section className="guestbook-section"><div className="section-kicker">06 / GUESTBOOK</div><div className="guestbook-head"><h2>留下你的<br /><em>一句話。</em></h2><form className="guestbook-form" onSubmit={addComment}><input value={commentName} onChange={(event) => setCommentName(event.target.value)} maxLength={24} placeholder="姓名" aria-label="姓名" /><div className="comment-input-wrap"><input value={commentText} onChange={(event) => setCommentText(event.target.value.replace(/[<>]/g, ""))} maxLength={50} placeholder="最多 50 字，分享一個想法" aria-label="留言" /><span>{commentText.length}/50</span></div><button className="button button-outline" type="submit">送出 <ArrowUpRight size={15} /></button></form></div><div className="comment-grid">{comments.slice(0, 4).map((comment) => <article className="comment-card" key={comment.id}><Quote size={21} /><p>{comment.content}</p><div><strong>{comment.name}</strong><span>{comment.date}</span></div></article>)}</div></section>
+          <section className="guestbook-section"><div className="section-kicker">GUESTBOOK</div><div className="guestbook-head"><h2>留下你的<br /><em>一句話。</em></h2><form className="guestbook-form" onSubmit={addComment}><input value={commentName} onChange={(event) => setCommentName(event.target.value)} maxLength={24} placeholder="姓名" aria-label="姓名" /><div className="comment-input-wrap"><input value={commentText} onChange={(event) => setCommentText(event.target.value.replace(/[<>]/g, ""))} maxLength={50} placeholder="最多 50 字，分享一個想法" aria-label="留言" /><span>{commentText.length}/50</span></div><button className="button button-outline" type="submit">送出 <ArrowUpRight size={15} /></button></form></div><div className="comment-grid">{comments.slice(0, 4).map((comment) => <article className="comment-card" key={comment.id}><Quote size={21} /><p>{comment.content}</p><div><strong>{comment.name}</strong><span>{comment.date}</span></div></article>)}</div></section>
 
           <footer className="site-footer"><div className="footer-brand"><span className="brand-mark">H</span><span>廖和風<br /><small>Digital Architect</small></span></div><p>© 2026 Hofong Liao. Built with curiosity.</p><div><button onClick={() => scrollTo("top")}>Back to top <ArrowUpRight size={14} /></button></div></footer>
         </main>
