@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Public portfolio content can be read by every device; only authenticated
+    // editor accounts may create or update it.
+    match /portfolio/siteContent {
+      allow read: if true;
+      allow create, update: if request.auth != null;
+      allow delete: if false;
+    }
+  }
+}
+
+// Publish these rules once in Firebase Console > Firestore Database > Rules.
+// The GitHub Pages build can use the Firestore client, but cannot publish rules
+// without a Firebase CLI credential or a configured GitHub secret.

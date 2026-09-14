@@ -1,6 +1,6 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { doc, getFirestore, setDoc } from "firebase/firestore";
+import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDQYxxFHc8iXa7MKBgyXfzNE8EgxjZqJdk",
@@ -22,7 +22,21 @@ export async function syncSiteContent(content: unknown): Promise<boolean> {
     await setDoc(doc(database, "portfolio", "siteContent"), { content, updatedAt: new Date().toISOString() }, { merge: true });
     return true;
   } catch (error) {
-    console.warn("Firebase sync is not available yet. Check Firestore rules and network.", error);
+    console.warn("Firebase sync failed. Check Firestore rules and network.", error);
     return false;
+  }
+}
+
+export async function loadSiteContent<T>(): Promise<T | null> {
+  try {
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const database = getFirestore(app);
+    const snapshot = await getDoc(doc(database, "portfolio", "siteContent"));
+    if (!snapshot.exists()) return null;
+    const data = snapshot.data()?.content;
+    return (data ?? null) as T | null;
+  } catch (error) {
+    console.warn("Firebase content read failed. Falling back to local content.", error);
+    return null;
   }
 }
