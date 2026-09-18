@@ -182,7 +182,22 @@ em { color: var(--accent); font-style: normal; }
 /* Stable admin ordering: only the handle starts a drag, form fields remain editable. */
 .drag-handle { display:grid; place-items:center; width:28px; min-height:28px; color:var(--accent); border:1px solid var(--line); cursor:grab; user-select:none; font-size:18px; line-height:1; }
 .drag-handle:active { cursor:grabbing; background:rgba(214,255,93,.12); }
-.project-editor { grid-template-columns:28px 92px 1fr 34px; }
+.project-editor { grid-template-columns:28px 1fr 34px; }
 .repeat-editor { grid-template-columns:28px .22fr .7fr 1.2fr 58px; }
 .repeat-editor.note-editor { grid-template-columns:28px .45fr .35fr .7fr 1.2fr 58px; }
-@media (max-width:650px) { .project-editor { grid-template-columns:28px 60px 1fr 28px; } .repeat-editor, .repeat-editor.note-editor { grid-template-columns:28px 1fr; } .repeat-editor .editor-order { grid-column:2; } }
+@media (max-width:650px) { .project-editor { grid-template-columns:28px 1fr 28px; } .repeat-editor, .repeat-editor.note-editor { grid-template-columns:28px 1fr; } .repeat-editor .editor-order { grid-column:2; } }
+
+/* Public navigation stays visible while scrolling. */
+.site-nav { position: fixed !important; top: 0; left: 0; right: 0; z-index: 50; }
+/* Compact project editors reduce long admin pages while keeping every field editable. */
+.project-editor-list { gap: 8px; }
+.project-editor-collapsible { border: 1px solid var(--line); background: var(--surface); }
+.project-editor-summary { display:grid; grid-template-columns:28px 72px 1fr auto; gap:12px; align-items:center; padding:10px 13px; cursor:pointer; list-style:none; }
+.project-editor-summary::-webkit-details-marker { display:none; }
+.project-editor-summary:after { content:'+'; color:var(--accent); font:18px 'DM Mono',monospace; }
+.project-editor-collapsible[open] .project-editor-summary:after { content:'−'; }
+.project-editor-summary img { width:72px; height:54px; object-fit:cover; background:#141918; }
+.project-editor-summary strong { display:block; font-size:13px; font-weight:500; }
+.project-editor-summary small { display:block; color:var(--muted); font:9px 'DM Mono',monospace; margin-top:4px; }
+.project-editor-collapsible .project-editor { border:0; border-top:1px solid var(--line); }
+@media (max-width:650px) { .project-editor-summary { grid-template-columns:28px 54px 1fr auto; gap:9px; } .project-editor-summary img { width:54px; height:45px; } }
