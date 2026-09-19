@@ -40,3 +40,28 @@ export async function loadSiteContent<T>(): Promise<T | null> {
     return null;
   }
 }
+
+export async function syncComments(comments: unknown): Promise<boolean> {
+  try {
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const database = getFirestore(app);
+    await setDoc(doc(database, "portfolio", "comments"), { comments, updatedAt: new Date().toISOString() }, { merge: true });
+    return true;
+  } catch (error) {
+    console.warn("Firebase comments sync failed. Check Firestore rules and network.", error);
+    return false;
+  }
+}
+
+export async function loadComments<T>(): Promise<T | null> {
+  try {
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const database = getFirestore(app);
+    const snapshot = await getDoc(doc(database, "portfolio", "comments"));
+    if (!snapshot.exists()) return null;
+    return (snapshot.data()?.comments ?? null) as T | null;
+  } catch (error) {
+    console.warn("Firebase comments read failed. Falling back to local comments.", error);
+    return null;
+  }
+}

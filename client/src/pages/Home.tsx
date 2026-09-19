@@ -32,7 +32,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { auth, loadSiteContent, syncSiteContent } from "@/lib/firebase";
+import { auth, loadComments as loadFirebaseComments, loadSiteContent, syncComments, syncSiteContent } from "@/lib/firebase";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 
 type Category = string;
@@ -313,6 +313,15 @@ export default function Home() {
         localStorage.setItem("hofong-site-content", JSON.stringify(merged));
       }
     });
+    loadFirebaseComments<Comment[]>().then((remote) => {
+      if (cancelled) return;
+      if (Array.isArray(remote)) {
+        setComments(remote);
+        localStorage.setItem("hofong-comments", JSON.stringify(remote));
+      } else {
+        void syncComments(loadComments());
+      }
+    });
     return () => { cancelled = true; };
   }, []);
 
@@ -356,15 +365,25 @@ export default function Home() {
     setActiveImage((previous) => ({ ...previous, [projectId]: next }));
   };
 
-  const addComment = (event: React.FormEvent) => {
+  const addComment = async (event: React.FormEvent) => {
     event.preventDefault();
     const name = commentName.trim().slice(0, 24);
     const message = commentText.trim().slice(0, 50);
     if (!name || !message) return setNotice("請填寫姓名與留言內容");
-    setComments((previous) => [{ id: Date.now(), name, content: message, date: new Date().toISOString().slice(0, 10).replaceAll("-", ".") }, ...previous]);
+    const nextComment = { id: Date.now(), name, content: message, date: new Date().toISOString().slice(0, 10).replaceAll("-", ".") };
+    const nextComments = [nextComment, ...comments];
+    setComments(nextComments);
+    const synced = await syncComments(nextComments);
     setCommentName("");
     setCommentText("");
-    setNotice("留言已加入，謝謝你的分享");
+    setNotice(synced ? "留言已加入並同步到 Firebase" : "留言已加入，但 Firebase 同步失敗");
+  };
+  const deleteComment = async (commentId: number) => {
+    if (!window.confirm("確定要刪除這則留言嗎？")) return;
+    const nextComments = comments.filter((comment) => comment.id !== commentId);
+    setComments(nextComments);
+    const synced = await syncComments(nextComments);
+    setNotice(synced ? "留言已刪除並同步到 Firebase" : "留言已刪除，但 Firebase 同步失敗");
   };
 
   const saveAdmin = async () => {
@@ -497,7 +516,7 @@ export default function Home() {
       {page === "home" ? (
         <main>
           <section className="hero-section" id="top">
-            <div className="hero-backdrop" style={{ backgroundImage: `linear-gradient(90deg, rgba(11,13,14,.97) 5%, rgba(11,13,14,.76) 45%, rgba(11,13,14,.34)), url('${content.heroBackground}')` }} />
+            <div className="hero-backdrop" style={{ backgroundImage: `linear-gradient(90deg, rgba(17,31,40,.94) 3%, rgba(22,42,53,.76) 45%, rgba(21,39,49,.34)), url('${content.heroBackground}')` }} />
             <div className="hero-grid" />
             <div className="hero-content">
               <div className="hero-copy reveal-up">
@@ -568,7 +587,7 @@ export default function Home() {
             <div className="contact-card"><div className="section-kicker">05 / SAY HELLO</div><div className="contact-layout"><div><h2>有一個想法？<br /><em>讓我們把它做出來。</em></h2><p>不論是作品合作、展覽邀請，或只是想交換一個好問題，都歡迎寫信給我。</p><button className="email-line" onClick={copyEmail}><Mail size={17} /> {content.email} <Copy size={14} /></button><div className="social-links"><a href={content.instagram} target="_blank" rel="noreferrer"><Instagram size={17} /> Instagram</a></div></div><form className="contact-form" onSubmit={(event) => { event.preventDefault(); setContactSent(true); }}><label>你的名字<input required placeholder="How should I call you?" /></label><label>Email<input required type="email" placeholder="you@example.com" /></label><label>想聊什麼？<textarea required rows={4} placeholder="Tell me a little about the project..." /></label><button className="button button-primary" type="submit">{contactSent ? <><Check size={16} /> 已送出</> : <><Send size={16} /> 送出訊息</>}</button></form></div></div>
           </section>
 
-          <section className="guestbook-section"><div className="section-kicker">06 / GUESTBOOK</div><div className="guestbook-head"><h2>留下你的<br /><em>一句話。</em></h2><form className="guestbook-form" onSubmit={addComment}><input value={commentName} onChange={(event) => setCommentName(event.target.value)} maxLength={24} placeholder="姓名" aria-label="姓名" /><div className="comment-input-wrap"><input value={commentText} onChange={(event) => setCommentText(event.target.value.replace(/[<>]/g, ""))} maxLength={50} placeholder="最多 50 字，分享一個想法" aria-label="留言" /><span>{commentText.length}/50</span></div><button className="button button-outline" type="submit">送出 <ArrowUpRight size={15} /></button></form></div><div className="comment-grid">{comments.slice(0, 4).map((comment) => <article className="comment-card" key={comment.id}><Quote size={21} /><p>{comment.content}</p><div><strong>{comment.name}</strong><span>{comment.date}</span></div></article>)}</div></section>
+          <section className="guestbook-section"><div className="section-kicker">06 / GUESTBOOK</div><div className="guestbook-head"><h2>留下你的<br /><em>一句話。</em></h2><form className="guestbook-form" onSubmit={addComment}><input value={commentName} onChange={(event) => setCommentName(event.target.value)} maxLength={24} placeholder="姓名" aria-label="姓名" /><div className="comment-input-wrap"><input value={commentText} onChange={(event) => setCommentText(event.target.value.replace(/[<>]/g, ""))} maxLength={50} placeholder="最多 50 字，分享一個想法" aria-label="留言" /><span>{commentText.length}/50</span></div><button className="button button-outline" type="submit">送出 <ArrowUpRight size={15} /></button></form></div><div className="comment-grid">{comments.slice(0, 4).map((comment) => <article className="comment-card" key={comment.id}><button className="comment-delete" type="button" onClick={() => deleteComment(comment.id)} aria-label={`刪除 ${comment.name} 的留言`} title="刪除留言"><Trash2 size={14} /></button><Quote size={21} /><p>{comment.content}</p><div><strong>{comment.name}</strong><span>{comment.date}</span></div></article>)}</div></section>
 
           <footer className="site-footer"><div className="footer-brand"><span className="brand-mark">H</span><span>廖和風<br /><small>Digital Architect</small></span></div><p>© 2026 Hofong Liao. Built with curiosity.</p><div><button onClick={() => scrollTo("top")}>Back to top <ArrowUpRight size={14} /></button></div></footer>
         </main>
