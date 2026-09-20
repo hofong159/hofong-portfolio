@@ -250,6 +250,7 @@ function loadContentFromValue(value: SiteContent): SiteContent {
   return {
     ...DEFAULT_CONTENT,
     ...parsed,
+    heroBackground: typeof parsed.heroBackground === "string" && parsed.heroBackground.trim() ? parsed.heroBackground : DEFAULT_CONTENT.heroBackground,
     categories: Array.isArray(parsed.categories) && parsed.categories.length ? parsed.categories.filter((item): item is string => typeof item === "string" && item.trim().length > 0) : DEFAULT_CONTENT.categories,
     certificates: uniqueItems(Array.isArray(parsed.certificates) ? parsed.certificates : DEFAULT_CONTENT.certificates),
     stats: uniqueItems(Array.isArray(parsed.stats) ? parsed.stats : DEFAULT_CONTENT.stats),
@@ -516,7 +517,7 @@ export default function Home() {
       {page === "home" ? (
         <main>
           <section className="hero-section" id="top">
-            <div className="hero-backdrop" style={{ backgroundImage: `linear-gradient(90deg, rgba(17,31,40,.94) 3%, rgba(22,42,53,.76) 45%, rgba(21,39,49,.34)), url('${content.heroBackground}')` }} />
+            <div className="hero-backdrop" style={{ backgroundImage: `linear-gradient(90deg, rgba(17,31,40,.94) 3%, rgba(22,42,53,.76) 45%, rgba(21,39,49,.34)), url('${content.heroBackground || DEFAULT_CONTENT.heroBackground}')` }} />
             <div className="hero-grid" />
             <div className="hero-content">
               <div className="hero-copy reveal-up">
