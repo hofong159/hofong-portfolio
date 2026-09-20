@@ -517,7 +517,7 @@ export default function Home() {
       {page === "home" ? (
         <main>
           <section className="hero-section" id="top">
-            <div className="hero-backdrop" style={{ backgroundImage: `linear-gradient(90deg, rgba(17,31,40,.94) 3%, rgba(22,42,53,.76) 45%, rgba(21,39,49,.34)), url('${content.heroBackground || DEFAULT_CONTENT.heroBackground}')` }} />
+            <div className="hero-backdrop" style={{ backgroundImage: `linear-gradient(90deg, rgba(23,49,63,.72) 3%, rgba(25,54,68,.46) 45%, rgba(28,56,67,.16)), url('${content.heroBackground || DEFAULT_CONTENT.heroBackground}')` }} />
             <div className="hero-grid" />
             <div className="hero-content">
               <div className="hero-copy reveal-up">

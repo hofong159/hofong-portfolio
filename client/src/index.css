@@ -224,3 +224,11 @@ body { background: radial-gradient(circle at 12% 0%, rgba(62, 116, 135, .28), tr
 .hero-section { align-items: flex-start; }
 .hero-content { margin-top: 0; }
 @media (max-width: 850px) { .hero-section { align-items: flex-start; } }
+
+
+/* Final contrast guard: the portfolio stays blue-gray and the editable hero photo remains visible. */
+html { background: #1b303d !important; }
+body { background: radial-gradient(circle at 12% 0%, rgba(73, 139, 161, .34), transparent 35%), radial-gradient(circle at 88% 18%, rgba(243, 161, 95, .16), transparent 30%), linear-gradient(135deg, #1b303d 0%, #172a36 55%, #223744 100%) !important; }
+.site-shell { background: linear-gradient(135deg, #1b303d 0%, #172a36 55%, #223744 100%) !important; }
+.intro-strip, .timeline-section, .work-section, .certificates-section, .journal-section, .contact-section, .guestbook-section { background: transparent !important; }
+.hero-backdrop { filter: saturate(.96) brightness(1.08) !important; background-color: #294858 !important; }
