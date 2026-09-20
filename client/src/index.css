@@ -232,3 +232,10 @@ body { background: radial-gradient(circle at 12% 0%, rgba(73, 139, 161, .34), tr
 .site-shell { background: linear-gradient(135deg, #1b303d 0%, #172a36 55%, #223744 100%) !important; }
 .intro-strip, .timeline-section, .work-section, .certificates-section, .journal-section, .contact-section, .guestbook-section { background: transparent !important; }
 .hero-backdrop { filter: saturate(.96) brightness(1.08) !important; background-color: #294858 !important; }
+
+
+/* Navy-to-amber atmosphere: replace the near-black canvas while preserving the hero photograph. */
+html, body { background: linear-gradient(135deg, #092844 0%, #102f4a 42%, #263a45 72%, #60451f 100%) !important; }
+.site-shell { background: linear-gradient(135deg, #092844 0%, #102f4a 42%, #263a45 72%, #60451f 100%) !important; }
+.hero-section { background: linear-gradient(135deg, #092844 0%, #102f4a 45%, #60451f 100%); }
+.hero-backdrop { filter: saturate(1.12) brightness(1.14) !important; }
